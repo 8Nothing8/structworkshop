@@ -19,20 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-## 第三方资源 / Third-party notices
-
-本仓库的**代码**按上面的 MIT 许可发布。它**不包含**下列内容，请注意各自的授权：
-
-- **Minecraft 游戏资源**（方块模型 / 贴图）：由 `mcrender` 在运行时从你自己安装的
-  Minecraft 客户端里抽取到 `.cache/mcassets/`（已 gitignore）。这些资源的版权属于
-  Mojang / Microsoft，本仓库不再分发。
-- **规范文档语料**（`kb/`，如 GB 系列国标）：`.gitignore` 明确排除原件
-  （`kb/inbox/`、`kb/releases/*/source.pdf`），只可能提交你自己有权处理的派生文本。
-- **资产包**（`packs/`）：本地内容，不在本仓库里。里面若引用了他人作品，授权由使用者自负。
-- **前端 vendor**：`packages/mcstudio/web/vendor/` 下的
-  [deepslate](https://github.com/misode/deepslate) 与
-  [gl-matrix](https://github.com/toji/gl-matrix) 保留各自许可证
-  （同目录 `LICENSE-*.txt`）。
