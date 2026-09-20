@@ -1,0 +1,39 @@
+[
+ {
+  "stage": "floor0",
+  "index": 1,
+  "new_blocks": 438,
+  "connections_ok": 3,
+  "connections": 3,
+  "conflicts": [],
+  "instances": 4
+ },
+ {
+  "stage": "floor1",
+  "index": 2,
+  "new_blocks": 134,
+  "connections_ok": 4,
+  "connections": 4,
+  "conflicts": [],
+  "instances": 1,
+  "images": [
+   "staged_house_s02_floor1_front.png",
+   "staged_house_s02_floor1_iso.png",
+   "staged_house_s02_floor1_top.png"
+  ]
+ },
+ {
+  "stage": "decor",
+  "index": 3,
+  "new_blocks": 45,
+  "connections_ok": 4,
+  "connections": 4,
+  "conflicts": [],
+  "instances": 3,
+  "images": [
+   "staged_house_s03_decor_front.png",
+   "staged_house_s03_decor_iso.png",
+   "staged_house_s03_decor_top.png"
+  ]
+ }
+]

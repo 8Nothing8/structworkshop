@@ -1,0 +1,34 @@
+# 文本一律 LF。仓库里按**字节**算 sha256 的地方（packs/*/pack.json 的 files、
+# kb/**/manifest.json）经不起 CRLF —— 见 tools/lf_check.py 与 mccore.paths.write_text_lf。
+* text=auto eol=lf
+
+# 例外：Windows 批处理**必须 CRLF** —— cmd.exe 读 LF-only 的 .bat/.cmd 会吞字符
+# （实测：`chcp 65001` 被解析成 `01`，脚本直接跑不动）。它们不在 packs/ 里，
+# 也不参与任何按字节的 sha256，所以这里单独放行。见 tools/lf_check.py 的 CRLF_EXT。
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制：别让 git 尝试做行尾/编码归一（这些按字节存，一改就坏）
+*.schem      binary
+*.schematic  binary
+*.litematic  binary
+*.nbt        binary
+*.mcstructure binary
+*.glb        binary
+*.gltf       binary
+*.zip        binary
+*.gz         binary
+*.pdf        binary
+*.png        binary
+*.jpg        binary
+*.jpeg       binary
+*.webp       binary
+*.ttf        binary
+*.ttc        binary
+*.otf        binary
+*.whl        binary
+
+# 生成物：合并时不必当成代码（diff 没意义，冲突了直接重跑生成器）
+registry.json   -diff
+packs/index.json -diff
+packs/catalog.md -diff

@@ -1,0 +1,25 @@
+# 让编辑器写出来的文件与 git blob 字节一致（.gitattributes = * text=auto eol=lf）。
+# 原因见 tools/lf_check.py 与 mccore.paths.write_text_lf：
+# 仓库里按字节算 sha256 的地方（packs/*/pack.json、kb/**/manifest.json）经不起 CRLF。
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+# 注意：**不要**打开 insert_final_newline —— 仓库里有若干「按字节哈希」的
+# json / module_gen.py 本来就没有末尾换行，编辑器自动补一个会让校验和变红。
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[*.{js,css,html}]
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+# Windows 批处理必须 CRLF（cmd.exe 读 LF-only 的 .bat 会吞字符）
+[*.{bat,cmd}]
+end_of_line = crlf

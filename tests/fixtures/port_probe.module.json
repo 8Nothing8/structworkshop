@@ -1,0 +1,44 @@
+{
+ "id": "port_probe",
+ "pack": "tests",
+ "category": "fixtures",
+ "version": 1,
+ "description": "端口编辑回归夹具：东面/顶面各一个 2×2 洞，自带一个 passage 端口",
+ "tags": [
+  "fixture",
+  "ports"
+ ],
+ "grid": {
+  "size": [
+   5,
+   5,
+   5
+  ],
+  "position": [
+   0,
+   0,
+   0
+  ]
+ },
+ "axis": "x",
+ "flip": false,
+ "ports": [
+  {
+   "id": "east_hole",
+   "type": "passage",
+   "face": "east",
+   "origin": [
+    1,
+    1
+   ],
+   "size": [
+    2,
+    2
+   ],
+   "tags": [
+    "fixture"
+   ]
+  }
+ ],
+ "notes": "端口编辑回归夹具"
+}

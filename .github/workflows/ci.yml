@@ -1,0 +1,113 @@
+name: CI
+
+# 纯代码 checkout 上必须全绿：`packs/` `builds/` `kb/` 是本地内容，CI 里没有，
+# 所以测试遇到缺数据要 skip（退出码 2）而不是 fail —— 这条同时也在守「代码不依赖本地数据」。
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: smoke (${{ matrix.os }} / py${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.10", "3.12"]
+        exclude:
+          # macOS 只跑一个版本，省 runner 时间（平台差异比版本差异大）
+          - os: macos-latest
+            python-version: "3.10"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      # numpy 是核心依赖；numba/pillow/nbt 给渲染与 .litematic 用。
+      # 不装 kb extra —— 它会拖 onnxruntime 下来，CI 里用不着。
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[runtime]"
+
+      - name: Show which checkout we are actually importing
+        run: python -c "import mccore, sys; print(mccore.__file__); assert 'site-packages' not in mccore.__file__"
+
+      # 纯代码 checkout：packs/ compositions/ builds/ 都不在 —— 引擎必须能干活。
+      # 这一条把「内核不得依赖本地内容」变成 CI 里的硬约束。
+      - name: Engine works with no local content
+        shell: bash
+        run: |
+          for c in \
+            "python -m mccore.registry list" \
+            "python -m mccore.registry validate" \
+            "python -m mccore.pack list" \
+            "python -m mccore.pack validate" \
+            "python -m mccore.module_lib list" \
+            "python -m mccore.compose --list" \
+            "python -m mccore.bootstrap --check"; do
+            echo "--- $c"
+            $c || { echo "FAILED: $c"; exit 1; }
+          done
+
+      - name: Line endings must be LF (byte-exact sha256 depends on it)
+        run: python tools/lf_check.py
+
+      # 渲染类冒烟跑的是 offline=True（只读 .cache/mcassets），CI 上缓存是空的。
+      # 预热一下让它们真的跑起来；预热失败也不报错 —— 测试会自己 skip（退出码 2）。
+      - name: Warm Minecraft asset cache (best effort)
+        continue-on-error: true
+        run: |
+          python -m mcrender.assets --data-version 4903 --prefetch \
+            stone water lava oak_stairs chest ender_chest white_banner \
+            skeleton_skull white_shulker_box decorated_pot white_bed oak_sign bell
+
+      - name: Registry / pack schema
+        run: |
+          python -m mccore.registry validate
+          python -m mccore.pack validate
+
+      # 派生产物（registry.json / packs/index.json / pack.json / catalog.md / README 现状块）
+      # 必须是**算出来的**。这一条专门拦「有人/AI 手改了它们」。
+      - name: Derived artifacts are generated, not hand-written
+        run: python -m mccore.bootstrap --check
+
+      # AI 只会按 skill 找命令：没写进 skill 的命令 = 不存在。
+      # 这条把「命令面 ⊆ skill 覆盖面」变成硬约束。
+      - name: Every command is documented in a skill
+        run: python tests/skills_smoke.py
+
+      - name: Smoke suite
+        shell: bash
+        run: |
+          fails=0
+          for t in tests/*_smoke.py; do
+            echo "===== $t ====="
+            python "$t" || { rc=$?; if [ $rc -eq 2 ]; then echo "  (skipped)"; else fails=$((fails+1)); fi; }
+          done
+          echo "failures: $fails"
+          exit $fails
+
+      - name: Build wheel and check runtime data is packaged
+        run: |
+          python -m pip install --upgrade build
+          python -m build --wheel
+          python - <<'PY'
+          import glob, zipfile
+          whl = glob.glob("dist/*.whl")[0]
+          names = set(zipfile.ZipFile(whl).namelist())
+          must = ["mckit/data/center_cover.json",
+                  "mcrender/data/entity_models.json",
+                  "mcstudio/web/index.html",
+                  "mcstudio/web/vendor/deepslate.umd.cjs"]
+          missing = [m for m in must if m not in names]
+          assert not missing, f"wheel 里缺运行时要用的文件: {missing}"
+          print("wheel OK:", whl, len(names), "entries")
+          PY

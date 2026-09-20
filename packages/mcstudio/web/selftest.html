@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>mcstudio 自检</title>
+<style>
+ body { background:#101216; color:#e8ecf1; font:13px/1.6 Consolas, monospace; padding:14px; }
+ canvas { background:#0b0d10; border:1px solid #2b333d; display:block; }
+ #log { white-space:pre-wrap; }
+ .ok { color:#43c07d; } .err { color:#e56b6b; }
+</style>
+</head>
+<body>
+<h3>mcstudio 自检（3D 资源 / 结构读取）</h3>
+<canvas id="c" width="640" height="400"></canvas>
+<div id="log">running…</div>
+<script src="/static/vendor/gl-matrix.umd.js"></script>
+<script src="/static/vendor/deepslate.umd.cjs"></script>
+<script src="/static/renderer3d.js"></script>
+<script src="/static/viewer3d.js"></script>
+<script>
+(function () {
+  const log = (m, cls) => {
+    const d = document.getElementById('log');
+    d.insertAdjacentHTML('beforeend', '\n<span class="' + (cls || '') + '">' + m + '</span>');
+  };
+  log('mcstudio selftest start');
+  const path = new URLSearchParams(location.search).get('path') ||
+    'packs/modern-arch/modules/rooms/modern_lobby.schem';
+  (async () => {
+    try {
+      const canvas = document.getElementById('c');
+      const viewer = new McStudio3D.VoxelViewer(canvas);
+      log('WebGL ok: ' + (canvas.getContext('webgl') ? 'yes' : 'no'));
+      const st = await (await fetch('/api/structure/open', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path }),
+      })).json();
+      if (st.error) throw new Error(st.error);
+      log('structure: ' + st.name + ' ' + st.size.join('x') + ' palette=' + st.palette.length +
+          ' version=' + st.version);
+      const buf = await (await fetch('/api/structure/' + st.sid + '/voxels')).arrayBuffer();
+      const pi = await (await fetch('/api/palette-info', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ states: st.palette, version: st.version }),
+      })).json();
+      const colors = {}, flags = {};
+      for (const [s, v] of Object.entries(pi.info || {})) {
+        colors[s] = v.color;
+        flags[s] = { opaque: v.opaque, semi_transparent: v.semi_transparent,
+                     self_culling: v.self_culling };
+      }
+      const mode = await viewer.load(
+        { size: st.size, palette: st.palette, version: st.version, colors, flags },
+        new Uint16Array(buf));
+      viewer.fit();
+      viewer.draw();
+      const gl = viewer.gl;
+      const px = new Uint8Array(4);
+      gl.readPixels(Math.floor(gl.drawingBufferWidth / 2), Math.floor(gl.drawingBufferHeight / 2),
+                    1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      log('render mode=' + mode + ' centerPixel=' + [...px].join(','), 'ok');
+      log('SELFTEST OK', 'ok');
+    } catch (e) {
+      log('SELFTEST ERR ' + e.message + '\n' + (e.stack || ''), 'err');
+    }
+  })();
+})();
+</script>
+</body>
+</html>

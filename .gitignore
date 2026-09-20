@@ -1,0 +1,40 @@
+# ---- Python 构建产物 ----
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- 本地缓存（Minecraft 资源抽取、截图、备份、临时渲染）----
+.cache/
+**/out/
+_smoke_*
+*.log
+
+# ---- 离线安装包（tools/make_release.py --wheels 生成，平台相关，别进仓库）----
+wheels/
+
+# ---- 编辑器 / 操作系统 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# ---- 可选数据层：仓库只带引擎 + 组合定义，下面这些是「本机内容」----
+# kb 语料：原件默认不进 git（版权 + 体积）；full.md/manifest 可提交
+kb/inbox/
+kb/export/
+kb/index.sqlite
+kb/releases/*/source.pdf
+
+# 本地凭据：视觉模型 API key 之类，永远不要进仓库
+auth.json
+.env
+.env.*
+!.env.example

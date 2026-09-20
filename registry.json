@@ -1,0 +1,21 @@
+{
+ "compositions": [],
+ "packs": {},
+ "corpus": {},
+ "tools": [
+  {
+   "id": "mcstudio",
+   "name": "mcstudio 可视化工作台",
+   "description": "本地浏览器工作台：模块库（标签管理/批量打标/导入）、3D 预览（deepslate，真实方块模型与贴图）、.schem/.litematic 结构编辑（放置/擦除/替换/撤销/另存为模块）。",
+   "command": "python -m mcstudio serve --open",
+   "url": "http://127.0.0.1:8617/",
+   "selftest": "http://127.0.0.1:8617/static/selftest.html",
+   "skill": "minecraft-studio",
+   "features": [
+    "modules-tags",
+    "3d-preview",
+    "structure-editor"
+   ]
+  }
+ ]
+}

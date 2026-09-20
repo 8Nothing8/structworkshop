@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "structworkshop"
+version = "0.2.0"
+description = "Parametric Minecraft structure toolkit: modules, packs, compositions, renderer, QA"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+keywords = [
+    "minecraft", "schematic", "voxel", "procedural-generation",
+    "parametric", "sponge-schematic", "litematic", "renderer",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Games/Entertainment",
+    "Topic :: Multimedia :: Graphics :: 3D Rendering",
+]
+
+# 核心：`mccore` 一被 import 就要 numpy（结构读写 / 体素运算）。
+# 别的都在 extras 里 —— 见下。别把这里清空：清空了 `pip install .` 出来的是坏安装。
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+# 渲染（mcrender：真实方块模型 + 贴图，numba 光栅器 + pillow 出图）
+render = ["numba>=0.58", "pillow>=9.0"]
+# 读 .litematic（存储格式是 .schem，这个是兼容读）
+litematic = ["nbt>=1.5"]
+# 规范语料库（mckb：PDF 取字 + OCR）
+kb = ["PyMuPDF>=1.23", "rapidocr-onnxruntime>=1.3"]
+# 一次装齐「跑得动全部功能」（不含 kb —— 那个要下模型，体积大）
+runtime = [
+    "numpy>=1.24",
+    "numba>=0.58",
+    "pillow>=9.0",
+    "nbt>=1.5",
+]
+all = [
+    "numpy>=1.24",
+    "numba>=0.58",
+    "pillow>=9.0",
+    "nbt>=1.5",
+    "PyMuPDF>=1.23",
+    "rapidocr-onnxruntime>=1.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/8Nothing8/structworkshop"
+Repository = "https://github.com/8Nothing8/structworkshop"
+Issues = "https://github.com/8Nothing8/structworkshop/issues"
+
+[tool.setuptools]
+package-dir = { "" = "packages" }
+
+[tool.setuptools.packages.find]
+where = ["packages"]
+
+[tool.setuptools.package-data]
+# 每个包的 README 随包发布（包门口就是边界说明）
+"*" = ["*.md"]
+# 运行时要读的数据表：漏一个，装出来的包就是坏的（以前 mcrender/data 就没带上）
+mckit = ["data/*.json"]
+mcrender = ["data/*.json"]
+# 工作台前端（含 vendor 下的 deepslate / gl-matrix）
+mcstudio = ["web/*", "web/vendor/*"]
