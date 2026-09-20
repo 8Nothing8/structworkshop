@@ -55,9 +55,12 @@ def git_files(root: Path) -> list[str]:
     否则在这个工具里会报一个看不懂的 ``CalledProcessError``。
     """
     try:
+        # git 吐的是 UTF-8 路径（仓库里有 `启动工作台.bat`）；Windows 的管道默认按代码页
+        # 解码，不写死 encoding 会 UnicodeDecodeError（cp1252 里 0x90 是非法的）。
         out = subprocess.run(
             ["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
-            cwd=root, capture_output=True, text=True, check=True).stdout
+            cwd=root, capture_output=True, text=True,
+            encoding="utf-8", errors="replace", check=True).stdout
         return [f for f in out.split("\0") if f]
     except (OSError, subprocess.SubprocessError):
         return walk_files(root)

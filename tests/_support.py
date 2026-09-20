@@ -34,6 +34,15 @@ ROOT = Path(__file__).resolve().parents[1]
 #: 跳过时统一的退出码（与 tests/_browser.js 的 skip 对齐）。
 SKIP_CODE = 2
 
+# 这个模块是「可选内容 / 渲染缓存」类冒烟的第一入口：CI 是**纯代码 checkout**，
+# `compositions/` `packs/` 都不在 → 那些测试走 _skip() 打印中文。先把 stdout 切成
+# UTF-8，否则 Windows runner 的 cp1252 会把「跳过（rc=2）」变成 UnicodeEncodeError（rc=1）。
+if str(ROOT / "packages") not in sys.path:
+    sys.path.insert(0, str(ROOT / "packages"))
+from mccore.paths import configure_stdio  # noqa: E402
+
+configure_stdio()
+
 
 def _skip(msg: str, script: str | None) -> None:
     print(f"[skip] {msg}")

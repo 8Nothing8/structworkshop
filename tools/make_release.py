@@ -20,7 +20,7 @@
     构建产物   dist  build  *.zip  _smoke_*
 
 带上的东西：`packages/ skills/ tests/ tools/ docs/ .pi/ pyproject.toml registry.json
-README.md AGENT.md INSTALL.md .env.example .editorconfig 启动工作台.bat start-workbench.sh`
+README.md AGENT.md INSTALL.md .env.example .editorconfig 启动工作台.bat 启动工作台.sh`
 （`packs/ builds/ compositions/ kb/` 是可选内容，不加 `--with-content` 就不带 ——
 它们体积大、且属于个人素材。）
 """
@@ -60,7 +60,7 @@ MACHINE_SCAN_SKIP = {
     ".env.example",
     "INSTALL.md",
     "启动工作台.bat",
-    "start-workbench.sh",
+    "启动工作台.sh",
     "tools/make_release.py",
     "tools/lf_check.py",
     "tests/editor_mesh_bench.js",   # `FAILED:\n` 被当成 `D:\`
@@ -176,7 +176,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.wheels:
         download_wheels(src)
 
-    for need in ("启动工作台.bat", "start-workbench.sh", "INSTALL.md", "pyproject.toml"):
+    for need in ("启动工作台.bat", "启动工作台.sh", "INSTALL.md", "pyproject.toml"):
         if not (src / need).exists():
             print(f"[!] 仓库里缺 {need} —— 发行包里会少东西（先在仓库根补上）", file=sys.stderr)
 
@@ -205,7 +205,7 @@ def main(argv: list[str] | None = None) -> int:
         z = make_zip(dst)
         print(f"zip: {z}  ({z.stat().st_size / 1048576:.1f} MB)")
 
-    print("\n下一步：双击 `启动工作台.bat`（Windows）或 `./start-workbench.sh`（macOS/Linux）"
+    print("\n下一步：双击 `启动工作台.bat`（Windows）或 `./启动工作台.sh`（macOS/Linux）"
           "\n        收件人第一次跑会自动建 .venv 并装依赖；删掉文件夹 = 卸载（不动系统 Python）。")
     return 0
 

@@ -75,7 +75,9 @@ rem PYTHONPATH 兜底：包被挪动/注册失效也照样能跑，并保证引�
 set "PYTHONPATH=%~dp0packages"
 
 rem ---- 自检：确认引擎是本文件夹这一份（不是别处 pip install -e . 绑定的那一份）----
-"%VPY%" tools\which_copy.py --expect "%~dp0"
+rem 注意：%~dp0 末尾带反斜杠，直接放进引号会被 C 运行时当成「转义引号」，所以要切掉
+set "HERE=%~dp0"
+"%VPY%" tools\which_copy.py --expect "%HERE:~0,-1%"
 if errorlevel 1 (
   echo.
   echo [x] 自检没过：上面「引擎」那行指向的不是本文件夹。

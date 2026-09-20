@@ -20,6 +20,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "packages"))
 
+from mccore.paths import configure_stdio  # noqa: E402
+
+configure_stdio()   # ALL PASS 行是中文：Windows 管道默认 cp1252，不打这针会 UnicodeEncodeError
+
 import numpy as np  # noqa: E402
 from PIL import Image  # noqa: E402
 

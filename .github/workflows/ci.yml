@@ -44,6 +44,11 @@ jobs:
       # 这一条把「内核不得依赖本地内容」变成 CI 里的硬约束。
       - name: Engine works with no local content
         shell: bash
+        # 故意保留 Windows runner 的默认管道代码页（cp1252）：引擎必须自己把 stdout 切成
+        # UTF-8 —— 曾经在这条上 UnicodeEncodeError（'\uff08' 编不出来，退出码 1）。
+        # 这一条就是那个 bug 的回归测试，别删。
+        env:
+          PYTHONIOENCODING: cp1252
         run: |
           for c in \
             "python -m mccore.registry list" \
@@ -86,6 +91,10 @@ jobs:
 
       - name: Smoke suite
         shell: bash
+        # 同上：故意用 Windows 的管道代码页跑（Linux/macOS runner 上也能提前复现
+        # Windows 才有的编码问题，不必等 windows job）。
+        env:
+          PYTHONIOENCODING: cp1252
         run: |
           fails=0
           for t in tests/*_smoke.py; do

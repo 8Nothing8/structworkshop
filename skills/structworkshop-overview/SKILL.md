@@ -44,7 +44,7 @@ python -m mccore.compose math-cube                  # 零依赖生成一座建�
 > 或临时 `PYTHONPATH=packages python -m ...`。
 >
 > **发给别人 / 换台机器跑**：那份「解压就能用」的说明在 [INSTALL.md](../../INSTALL.md) ——
-> 双击 `启动工作台.bat`（macOS/Linux 是 `./start-workbench.sh`）会在**本文件夹内**建 `.venv`、
+> 双击 `启动工作台.bat`（macOS/Linux 是 `./启动工作台.sh`）会在**本文件夹内**建 `.venv`、
 > 装依赖、起服务，不写系统 `site-packages`（删文件夹 = 卸载）。重新打一份干净发行包：
 > `python tools/make_release.py --zip`（默认剔掉 `.git/ .github/ .cache/ .venv/`，并扫绝对路径残留）。
 

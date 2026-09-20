@@ -5,9 +5,9 @@
 # 不碰系统 Python：所有东西都在本文件夹的 .venv 里，删掉文件夹 = 彻底卸载。
 #
 # 用法：
-#   chmod +x start-workbench.sh && ./start-workbench.sh
-#   ./start-workbench.sh --port 8700        # 后面跟的参数原样传给 mcstudio serve
-#   STRUCTWORKSHOP_NO_OPEN=1 ./start-workbench.sh   # 不自动开浏览器（服务器/测试用）
+#   chmod +x 启动工作台.sh && ./启动工作台.sh
+#   ./启动工作台.sh --port 8700        # 后面跟的参数原样传给 mcstudio serve
+#   STRUCTWORKSHOP_NO_OPEN=1 ./启动工作台.sh   # 不自动开浏览器（服务器/测试用）
 set -u
 cd "$(dirname "$0")" || exit 1
 

@@ -16,7 +16,7 @@
     <副本>/.venv/Scripts/python.exe tools/which_copy.py     # 看某份副本的 venv 认哪一份
     python tools/which_copy.py --json               # 机器可读
 
-启动脚本（`启动工作台.bat` / `start-workbench.sh`）内部就用 `--expect` 自检，
+启动脚本（`启动工作台.bat` / `启动工作台.sh`）内部就用 `--expect` 自检，
 保证「双击哪一份 = 用哪一份」。
 """
 from __future__ import annotations
@@ -133,7 +133,13 @@ def main(argv: list[str] | None = None) -> int:
         print("  · 想彻底不打架：pip uninstall -y structworkshop，之后各份只认自己的启动脚本")
 
     if a.expect:
-        want = Path(a.expect).expanduser().resolve()
+        # 容错：Windows 批处理里 `--expect "%~dp0"` 的末尾反斜杠会被 C 运行时当成转义引号，
+        # 于是参数里会多出一个 `"`。这里把引号和末尾分隔符吃掉再比。
+        want = Path(a.expect.strip().strip('"')).expanduser()
+        try:
+            want = want.resolve()
+        except OSError:
+            pass
         ok = bool(eng["available"]) and Path(eng["repo"]).resolve() == want
         print(f"\n自检 --expect {want}: {'通过 ✓' if ok else '不通过 ✗'}"
               + ("" if ok else f"（实际用的是 {eng.get('repo') or '未找到'}）"))

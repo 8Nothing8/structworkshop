@@ -20,6 +20,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PKGS_DIR = ROOT / "packages"
 
+sys.path.insert(0, str(PKGS_DIR))
+from mccore.paths import configure_stdio  # noqa: E402
+
+configure_stdio()   # PASS 行是中文：Windows 管道默认 cp1252，不打这针会 UnicodeEncodeError
+
 #: 层号：越小越靠内核（见 packages/ARCHITECTURE.md）
 LAYER = {"mccore": 0, "mckit": 1, "mcrender": 1,
          "mctools": 2, "mcqa": 2, "mcslice": 2,

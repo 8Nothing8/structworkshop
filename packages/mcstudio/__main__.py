@@ -4,6 +4,13 @@ from __future__ import annotations
 import argparse
 import sys
 
+from mccore.paths import configure_stdio
+
+# argparse 的 help / 报错都是中文，而 mccore 在真正干活前是**懒导入**的
+# （server 要到 parse_args 之后才拉）—— 所以这一针必须自己先打：
+# Windows 的管道默认按代码页（cp1252）编码，`python -m mcstudio --help` 会 UnicodeEncodeError。
+configure_stdio()
+
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="python -m mcstudio",

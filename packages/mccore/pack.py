@@ -73,9 +73,10 @@ def _git_author() -> str:
     无关的调用方一起带崩 —— 所以这里用宽 except + 缓存。
     """
     try:
+        # 作者名可能是中文：不写死 encoding，Windows 的管道会按代码页解码（cp1252 直接抛）
         r = subprocess.run(["git", "config", "--get", "user.name"],
                            cwd=str(repo_root()), capture_output=True,
-                           text=True, timeout=5)
+                           text=True, encoding="utf-8", errors="replace", timeout=5)
     except Exception:  # noqa: BLE001 —— 没 git / 被打桩 / 超时都算“不知道”
         return ""
     name = (r.stdout or "").strip()

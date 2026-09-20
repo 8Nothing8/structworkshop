@@ -8,6 +8,7 @@ current working directory, or overridden with ``STRUCTWORKSHOP_ROOT``
 from __future__ import annotations
 
 import os
+import sys
 from functools import lru_cache
 from pathlib import Path
 
@@ -154,6 +155,31 @@ def child_env(env: dict | None = None) -> dict:
     # 子进程要往管道里打中文：不指定就随终端代码页（Windows 上是 GBK）
     e.setdefault("PYTHONIOENCODING", "utf-8")
     return e
+
+
+def configure_stdio() -> None:
+    """把**本进程**的 stdout/stderr 切成 UTF-8（``mccore`` 被 import 时自动调一次）。
+
+    为什么要有它：Windows 上 stdout 只要不是终端（**管道 / 重定向**），Python 就用
+    ANSI 代码页编码输出 —— GitHub 的 windows runner 上是 cp1252，于是
+    ``print("（`compositions/` 里一个组合都没有 …")`` 直接抛
+    ``UnicodeEncodeError: 'charmap' codec can't encode character '\\uff08'``，命令
+    以退出码 1 收场（CI 上看起来就是「引擎在这台机器上不能干活」）。
+
+    子进程那边 :func:`child_env` 已经用 ``PYTHONIOENCODING=utf-8`` 兜住了；这里补上
+    **本进程** —— 所以调用点放在 :mod:`mccore.__init__`（每个入口都只 import 一次），
+    而不是散在十几个 ``main()`` 里：那种写法一定会漏，这次就漏在了 CI 上。
+
+    已经是 UTF-8 就原样返回（终端上 PEP 528 本来就是 UTF-8，别去改终端）；
+    ``errors="replace"`` 是最后一道保险 —— 宁可个别字符变 ``?``，也不要整条命令崩掉。
+    """
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            if (stream.encoding or "").replace("-", "").lower() == "utf8":
+                continue
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError, OSError, LookupError):
+            pass
 
 
 def write_text_lf(path, text: str) -> None:

@@ -33,8 +33,8 @@
 3. 在终端里：
 
 ```bash
-chmod +x start-workbench.sh      # 只需一次
-./start-workbench.sh
+chmod +x 启动工作台.sh      # 只需一次
+./启动工作台.sh
 ```
 
 `Ctrl + C` 退出。
@@ -65,7 +65,7 @@ chmod +x start-workbench.sh      # 只需一次
 
 | 你想启动哪一份 | 怎么做 |
 |---|---|
-| 某一份（推荐） | 双击**那一份**里的 `启动工作台.bat`（macOS/Linux 跑它的 `./start-workbench.sh`）。脚本会先自检：引擎不是本文件夹就报错退出，并打印实际用的是哪一份 |
+| 某一份（推荐） | 双击**那一份**里的 `启动工作台.bat`（macOS/Linux 跑它的 `./启动工作台.sh`）。脚本会先自检：引擎不是本文件夹就报错退出，并打印实际用的是哪一份 |
 | 命令行临时跑某一份 | `PYTHONPATH=<那份>/packages python -m mcstudio serve` |
 | 用某一份的 venv 干活 | Windows：`<那份>\.venv\Scripts\python.exe -m mcstudio serve`<br>macOS/Linux：`<那份>/.venv/bin/python -m mcstudio serve` |
 
@@ -129,7 +129,7 @@ packs/            投影素材包（资产包；本地内容，可选）
 compositions/     一类建筑的做法（生成器 + 提示词；可选）
 builds/ kb/       作品归档 / 规范语料（可选）
 启动工作台.bat     Windows 启动器（首次运行会自动安装）
-start-workbench.sh macOS / Linux 启动器
+启动工作台.sh macOS / Linux 启动器
 ```
 
 > 想自己重新生成一份这样的干净发行包：在仓库里跑 `python tools/make_release.py --zip`

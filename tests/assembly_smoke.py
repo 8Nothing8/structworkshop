@@ -438,7 +438,8 @@ def main() -> int:
         assert len(loose.instances) == 2, loose.instances
         assert "--overlap" in __import__("subprocess").run(
             [sys.executable, "-m", "mccore.assemble", "--help"],
-            capture_output=True, text=True, cwd=str(ROOT)).stdout
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            cwd=str(ROOT)).stdout
         print("PASS 16/16 模块可以堆叠（Assembler(overlap=True) + CLI --overlap）")
 
         # 17) 「打开即实例」：没有 id 的 detach = **整幅投影**（伪包 @self）。
