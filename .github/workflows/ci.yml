@@ -69,6 +69,9 @@ jobs:
       # 预热一下让它们真的跑起来；预热失败也不报错 —— 测试会自己 skip（退出码 2）。
       - name: Warm Minecraft asset cache (best effort)
         continue-on-error: true
+        # `\` 续行只有 bash 认（Windows runner 默认是 pwsh）—— 不写 shell 的话这条在 Windows
+        # 上必然失败（被 continue-on-error 掩盖），缓存热不起来，渲染冒烟就只能全跳过。
+        shell: bash
         run: |
           python -m mcrender.assets --data-version 4903 --prefetch \
             stone water lava oak_stairs chest ender_chest white_banner \
@@ -105,6 +108,9 @@ jobs:
           exit $fails
 
       - name: Build wheel and check runtime data is packaged
+        # 下面用了 heredoc（`python - <<'PY'`）—— pwsh 不认，必须显式声明 bash
+        # （否则只挂 Windows：Linux/macOS 默认就是 bash）。
+        shell: bash
         run: |
           python -m pip install --upgrade build
           python -m build --wheel
