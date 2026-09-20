@@ -366,18 +366,27 @@ def main() -> int:
         check("CLI info --json", rc == 0 and JSON.loads(txt)["id"] == "shatter")
 
         # QA 闸门：故意留一个悬空方块 → 退出码 1
-        vf = np.zeros((12, 12, 12), dtype=np.uint16)
-        vf[0] = 1
-        vf[8, 5, 5] = 1
-        fsrc = tmp / "float.schem"
-        SIO.write_structure(str(fsrc), vf, PAL[:2], (0, 0, 0), (12, 12, 12),
-                            name="float")
-        rc, txt = cli(["run", "painter", "--in", str(fsrc), "--out",
-                       str(tmp / "float2.schem"), "--at", "5,8,5",
-                       "--brush", "sphere:2", "--block", "minecraft:stone",
-                       "--qa"])
-        check("CLI --qa 有 ERROR 时退出码 1", rc == 1 and "QA" in txt,
-              txt.strip().splitlines()[-1] if txt else "")
+        # 悬浮组件检查要 scipy（可选依赖）：没装就跳这一条，不要在干净环境里假红。
+        try:
+            import scipy  # noqa: F401
+            has_scipy = True
+        except ImportError:
+            has_scipy = False
+        if not has_scipy:
+            print('[skip] CLI --qa 悬浮组件闸门要 scipy（`pip install -e ".[runtime]"`）')
+        else:
+            vf = np.zeros((12, 12, 12), dtype=np.uint16)
+            vf[0] = 1
+            vf[8, 5, 5] = 1
+            fsrc = tmp / "float.schem"
+            SIO.write_structure(str(fsrc), vf, PAL[:2], (0, 0, 0), (12, 12, 12),
+                                name="float")
+            rc, txt = cli(["run", "painter", "--in", str(fsrc), "--out",
+                           str(tmp / "float2.schem"), "--at", "5,8,5",
+                           "--brush", "sphere:2", "--block", "minecraft:stone",
+                           "--qa"])
+            check("CLI --qa 有 ERROR 时退出码 1", rc == 1 and "QA" in txt,
+                  txt.strip().splitlines()[-1] if txt else "")
 
         # --in-place：真实覆盖 + 自动备份
         ip = tmp / "inplace.schem"

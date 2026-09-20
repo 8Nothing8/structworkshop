@@ -39,18 +39,23 @@ render = ["numba>=0.58", "pillow>=9.0"]
 litematic = ["nbt>=1.5"]
 # 规范语料库（mckb：PDF 取字 + OCR）
 kb = ["PyMuPDF>=1.23", "rapidocr-onnxruntime>=1.3"]
-# 一次装齐「跑得动全部功能」（不含 kb —— 那个要下模型，体积大）
+# 一次装齐「跑得动全部功能」（不含 kb —— 那个要下模型，体积大）。
+# scipy 只有两处用得到：`mcqa` 的悬浮组件检查（ndimage.label）与 `mckit.meshvox` 的
+# 形态学闭孔 —— 都是**可选**能力，缺了代码会降级成警告（不许崩），但「全部功能」
+# 里包含 QA 闸门，所以照样列上。
 runtime = [
     "numpy>=1.24",
     "numba>=0.58",
     "pillow>=9.0",
     "nbt>=1.5",
+    "scipy>=1.10",
 ]
 all = [
     "numpy>=1.24",
     "numba>=0.58",
     "pillow>=9.0",
     "nbt>=1.5",
+    "scipy>=1.10",
     "PyMuPDF>=1.23",
     "rapidocr-onnxruntime>=1.3",
 ]

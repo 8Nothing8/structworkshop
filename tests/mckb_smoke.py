@@ -96,6 +96,11 @@ def test_text_pages() -> None:
 
 def test_text_ingest() -> None:
     """--text 外部 OCR 导入：页码校验 / manifest.extract / audit 待复核页。"""
+    try:
+        import fitz  # noqa: F401  PyMuPDF（kb extra）：用来造 PDF 夹具
+    except ImportError:
+        print('[skip] --text 导入链路要 PyMuPDF（kb extra）：`pip install -e ".[kb]"`')
+        return
     tmp = Path(tempfile.mkdtemp(prefix="mckb_ingest_"))
     root = tmp / "repo"
     (root / "packages").mkdir(parents=True)
@@ -108,7 +113,6 @@ def test_text_ingest() -> None:
     try:
         from mccore import paths as cp
         from mckb.extract import ingest
-        import fitz
 
         pdf = tmp / "src.pdf"
         doc = fitz.open()

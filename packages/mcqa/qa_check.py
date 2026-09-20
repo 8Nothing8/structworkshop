@@ -69,6 +69,20 @@ def cap(lst: list, n: int) -> list:
     return lst[:n] + [f"... 还有 {len(lst) - n} 条已省略"]
 
 
+def load_ndimage(warns: list[str]):
+    """取 scipy 的 ``ndimage``（悬浮组件检查用）；没装就记一条警告并返回 None。
+
+    scipy 是**可选**依赖（只有这一项检查与 ``mckit.meshvox`` 用得上）：干净环境
+    （只装核心 numpy）里不能把整条 QA 打崩 —— 降级成一条明确的警告，并告诉人怎么装回。
+    """
+    try:
+        from scipy import ndimage  # noqa: PLC0415  lazy: 只在真的有方块时 import
+        return ndimage
+    except ImportError:
+        warns.append('悬浮组件检查已跳过：需要 scipy（`pip install -e ".[runtime]"`）')
+        return None
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("input", help=".schem/.schem 文件")
@@ -107,9 +121,9 @@ def main(argv=None) -> int:
 
     # ---- 2. floating components -----------------------------------------
     non_air = voxels != 0
-    if non_air.any():
-        from scipy import ndimage  # lazy: only needed when there are blocks
-
+    # scipy 只在真的有方块时才需要；没装就跳这一项（见 load_ndimage）。
+    ndimage = load_ndimage(warns) if non_air.any() else None
+    if ndimage is not None:
         # compact name grid: palette index -> unique-name id (uint8)
         uniq, name_ids = np.unique(names, return_inverse=True)
         ngrid = name_ids.astype(np.uint8)[voxels]
