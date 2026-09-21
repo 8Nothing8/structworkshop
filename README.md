@@ -56,7 +56,9 @@
 
 ## 安装
 
-环境需要 **Python ≥ 3.10**（CI 覆盖 3.10 / 3.12，本机开发用 3.13）。
+环境需要 **Python ≥ 3.10**.
+
+最好提前安装好一个具有终端执行能力的ai工具,例如[deepseek harness](https://www.deepseek.com/harness/),[pi agent](https://pi.dev/).
 
 - 将下载的文件解压到一个文件夹,然后点击安装脚本.
 
@@ -117,8 +119,6 @@ registry.json      机器可读的能力清单（组合 + 资产包 + 语料）�
 | 某个包的职责 / 上游 / 不做 / API | `packages/<包>/README.md` |
 | AI 的入口与方法索引 | `skills/structworkshop-overview/SKILL.md` |
 | 注册表（机器可读能力清单） | `registry.json`、`python -m mccore.registry list` |
-
----
 
 ---
 
